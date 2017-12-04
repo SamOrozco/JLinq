@@ -1,0 +1,4 @@
+[submodule "Conditional"]
+	path = Conditional
+	url = https://github.com/apptreesoftware/Conditional
+	branch = master
