@@ -1,13 +1,12 @@
 package JavaLinq;
 
 import apptree.condition.Condition;
+import apptree.condition.ConditionClause;
 import apptree.condition.ConditionStatement;
+import apptree.condition.Operator;
 import apptree.condition.conditions.BasicCondition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class LinQExpressionBuilder<T> {
     Collection<T> initValue;
@@ -18,17 +17,56 @@ public abstract class LinQExpressionBuilder<T> {
 
     public class LinQBuilder<T> extends LinQ<T> {
         private List<Condition<T>> conditionalList;
+        private boolean combineNextAsOR;
 
 
         public LinQBuilder<T> eq(String fieldName, String value) {
-            Condition<T> condition = BasicCondition.<T>withCondition(conditionValue ->
-                                                                         Objects.equals(
-                                                                             getFieldValueFromNameAndType(
-                                                                                 fieldName,
-                                                                                 conditionValue,
-                                                                                 String.class),
-                                                                             value));
-            getConditionalList().add(condition);
+            Condition<T> condition = getEqualsStringCondition(fieldName, value);
+            if (combineNextAsOR) {
+                combineNextAsOR = false;
+                addORCondition(getConditionalList(), condition);
+            } else {
+                getConditionalList().add(condition);
+            }
+            return this;
+        }
+
+        public LinQBuilder<T> notEq(String fieldName, String value) {
+            Condition<T> condition = getNotEqualsStringCondition(fieldName, value);
+            if (combineNextAsOR) {
+                combineNextAsOR = false;
+                addORCondition(getConditionalList(), condition);
+            } else {
+                getConditionalList().add(condition);
+            }
+            return this;
+        }
+
+
+        public LinQBuilder<T> eq(String fieldName, Integer value) {
+            Condition<T> condition = getNotEqualsIntegerCondition(fieldName, value);
+            if (combineNextAsOR) {
+                combineNextAsOR = false;
+                addORCondition(getConditionalList(), condition);
+            } else {
+                getConditionalList().add(condition);
+            }
+            return this;
+        }
+
+        public LinQBuilder<T> notEq(String fieldName, Integer value) {
+            Condition<T> condition = getNotEqualsIntegerCondition(fieldName, value);
+            if (combineNextAsOR) {
+                combineNextAsOR = false;
+                addORCondition(getConditionalList(), condition);
+            } else {
+                getConditionalList().add(condition);
+            }
+            return this;
+        }
+
+        public LinQBuilder<T> OR() {
+            combineNextAsOR = true;
             return this;
         }
 
@@ -48,6 +86,17 @@ public abstract class LinQExpressionBuilder<T> {
             return returnList;
         }
 
+        private void addORCondition(List<Condition<T>> conditions,
+                                    Condition<T> orCondition) {
+            newConditionList(
+                new ConditionClause<>(new ConditionStatement<T>(conditions), orCondition,
+                                      Operator.OR));
+        }
+
+
+        private void newConditionList(Condition<T>... conditions) {
+            this.conditionalList = new ArrayList<>(Arrays.asList(conditions));
+        }
 
         private Condition<T> build() {
             return new ConditionStatement<T>(conditionalList);
