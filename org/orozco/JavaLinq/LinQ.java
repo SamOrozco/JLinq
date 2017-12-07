@@ -5,27 +5,30 @@ import apptree.condition.conditions.BasicCondition;
 import sun.rmi.transport.ObjectTable;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Objects;
+
+import static JavaLinq.utils.CollectionUtils.NullOrEmpty;
+import static JavaLinq.utils.CollectionUtils.inArray;
 
 public abstract class LinQ<T> {
     static ClassContainer classContainer;
 
-    public static Object getFieldValueFromNameAndType(String fieldName, Object value,
-                                                      Class<?> clazz) {
-        Class classValue = value.getClass();
-        classContainer = getClassContainer(classValue);
+    public static <K> Object getFieldValueFromNameAndType(String fieldName, K value, Class clazz) {
+
+        classContainer = getClassContainer(value.getClass());
+        ClassProxy proxy = new ClassProxy(clazz);
         Field field = classContainer.getFieldMap().get(fieldName);
         if (field == null) {
             throw new RuntimeException(
-                String.format("Class [%s] does not have field [%s]", classValue.getName(),
+                String.format("Class [%s] does not have field [%s]", clazz.getName(),
                               fieldName));
         }
 
         if (!classEquals(field.getType(), clazz)) {
             throw new RuntimeException(
-                String.format("Field [%s] is not of Type [%s]", fieldName, clazz.getName()));
+                String.format("Field [%s] is not of Type [%s]", fieldName, clazz));
         }
-
 
         try {
             return field.get(value);
@@ -36,30 +39,19 @@ public abstract class LinQ<T> {
     }
 
 
-    Condition<T> getEqualsStringCondition(String fieldName, String value) {
+    <K> Condition<T> getEqualsCondition(String fieldName, K value) {
         return BasicCondition.withCondition(conditionValue ->
                                                 Objects.equals(
                                                     getFieldValueFromNameAndType(
                                                         fieldName,
                                                         conditionValue,
-                                                        String.class),
+                                                        value.getClass()
+                                                    ),
                                                     value));
 
     }
 
-    Condition<T> getEqualsIntegerCondition(String fieldName, Integer value) {
-        return BasicCondition.withCondition(conditionValue ->
-                                                Objects.equals(
-                                                    getFieldValueFromNameAndType(
-                                                        fieldName,
-                                                        conditionValue,
-                                                        value.getClass()),
-                                                    value));
-
-    }
-
-
-    Condition<T> getNotEqualsStringCondition(String fieldName, String value) {
+    <K> Condition<T> getNotEqualsCondition(String fieldName, K value) {
         return BasicCondition.withCondition(conditionValue ->
                                                 !Objects.equals(
                                                     getFieldValueFromNameAndType(
@@ -69,19 +61,6 @@ public abstract class LinQ<T> {
                                                     value));
 
     }
-
-
-    Condition<T> getNotEqualsIntegerCondition(String fieldName, Integer value) {
-        return BasicCondition.withCondition(conditionValue ->
-                                                !Objects.equals(
-                                                    getFieldValueFromNameAndType(
-                                                        fieldName,
-                                                        conditionValue,
-                                                        value.getClass()),
-                                                    value));
-
-    }
-
 
     private static boolean classEquals(Class one, Class two) {
         String oneName = one.getName();
