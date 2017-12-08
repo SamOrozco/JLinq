@@ -15,5 +15,8 @@ public class Main {
         for (Test test : testCondition) {
             System.out.println(test.name);
         }
+
+        new ClassProxy(sam.getClass());
+        new ClassProxy(new String[1].getClass());
     }
 }

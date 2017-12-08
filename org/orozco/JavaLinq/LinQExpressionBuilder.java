@@ -44,6 +44,16 @@ public abstract class LinQExpressionBuilder<T> {
             return this;
         }
 
+//        public <K> LinQBuilder<T> in(String fieldName, Collection<K> collection) {
+//            Condition<T> condition = getInCondition(fieldName, collection);
+//            return this;
+//        }
+//
+//        public <K> LinQBuilder<T> in(String fieldName, K... collection) {
+//            Condition<T> condition = getInCondition(fieldName, collection);
+//            return this;
+//        }
+
         public LinQBuilder<T> OR() {
             combineNextAsOR = true;
             return this;

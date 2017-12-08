@@ -2,3 +2,6 @@
 	path = Conditional
 	url = https://github.com/apptreesoftware/Conditional
 	branch = master
+[submodule "org/Conditional"]
+	path = org/Conditional
+	url = https://github.com/apptreesoftware/Conditional

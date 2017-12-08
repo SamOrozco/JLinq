@@ -11,7 +11,7 @@ import java.util.Objects;
 import static JavaLinq.utils.CollectionUtils.NullOrEmpty;
 import static JavaLinq.utils.CollectionUtils.inArray;
 
-public abstract class LinQ<T> {
+public abstract class LinQ<T>  extends ConditionHelper {
     static ClassContainer classContainer;
 
     public static <K> Object getFieldValueFromNameAndType(String fieldName, K value, Class clazz) {
@@ -61,6 +61,32 @@ public abstract class LinQ<T> {
                                                     value));
 
     }
+
+
+//    <K> Condition<T> getInCondition(String fieldName, Collection<K> value) {
+//        ClassProxy proxy = new ClassProxy(value.getClass());
+//        return BasicCondition.withCondition(conditionValue ->
+//                                                !objectInCondition(
+//                                                    getFieldValueFromNameAndType(
+//                                                        fieldName,
+//                                                        conditionValue,
+//                                                        value.getClass()),
+//                                                    value));
+//
+//    }
+//
+//
+//    <K> Condition<T> getInCondition(String fieldName, K... value) {
+//        ClassProxy proxy = new ClassProxy(value.getClass());
+//        return BasicCondition.withCondition(conditionValue ->
+//                                                !objectInCondition(
+//                                                    getFieldValueFromNameAndType(
+//                                                        fieldName,
+//                                                        conditionValue,
+//                                                        value.getClass()),
+//                                                    value));
+//
+//    }
 
     private static boolean classEquals(Class one, Class two) {
         String oneName = one.getName();
